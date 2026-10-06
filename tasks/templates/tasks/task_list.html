@@ -1,0 +1,22 @@
+{% extends "tasks/base.html" %}
+{% block content %}
+<div class="filters card">
+  Filter:
+  <a href="{% url 'task_list' %}" class="{% if not status %}active{% endif %}">All</a>
+  {% for s in statuses %}
+    <a href="?status={{ s|urlencode }}" class="{% if status == s %}active{% endif %}">{{ s }}</a>
+  {% endfor %}
+</div>
+
+{% for task in tasks %}
+  <div class="card">
+    <h3><a href="{% url 'task_detail' task.pk %}">{{ task.title }}</a></h3>
+    <span class="badge {{ task.status|slugify|title }}">{{ task.status }}</span>
+    <span class="badge">{{ task.priority }}</span>
+    <span class="badge">{{ task.category }}</span>
+    <p class="muted">Deadline: {{ task.deadline|date:"M d, Y, g:i A" }}</p>
+  </div>
+{% empty %}
+  <p>No tasks found.</p>
+{% endfor %}
+{% endblock %}
