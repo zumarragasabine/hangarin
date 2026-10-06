@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 
 @login_required
 def task_list(request):
-    tasks = Task.objects.select_related("priority", "category").order_by("deadline")
+    tasks = Task.objects.filter(user=request.user).select_related("priority", "category").order_by("deadline")  # changed
     status = request.GET.get("status")
     if status in dict(Task.STATUS_CHOICES):
         tasks = tasks.filter(status=status)
@@ -19,14 +19,16 @@ def task_list(request):
         "statuses": [s[0] for s in Task.STATUS_CHOICES],
     })
 
+
 @login_required
 def task_detail(request, pk):
-    task = get_object_or_404(Task, pk=pk)
+    task = get_object_or_404(Task, pk=pk, user=request.user)  # changed
     return render(request, "tasks/task_detail.html", {
         "task": task,
         "notes": task.note_set.all(),
         "subtasks": task.subtask_set.all(),
     })
+
 
 def register(request):
     if request.user.is_authenticated:
