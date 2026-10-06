@@ -1,11 +1,8 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Task
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .forms import TaskForm
+from .models import Task, SubTask, Note
+from .forms import TaskForm, SubTaskForm, NoteForm
 
 @login_required
 def task_list(request):
@@ -32,15 +29,6 @@ def task_detail(request, pk):
     })
 
 
-def register(request):
-    if request.user.is_authenticated:
-        return redirect("task_list")
-    form = UserCreationForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        user = form.save()
-        login(request, user)
-        return redirect("task_list")
-    return render(request, "tasks/register.html", {"form": form})
 
 @login_required
 def task_create(request):
@@ -79,3 +67,86 @@ def task_complete(request, pk):
     task.status = "Completed"
     task.save()
     return redirect("task_list")
+
+
+# ---------- Subtasks ----------
+
+@login_required
+def subtask_create(request, task_pk):
+    task = get_object_or_404(Task, pk=task_pk, user=request.user)
+    form = SubTaskForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        sub = form.save(commit=False)
+        sub.parent_task = task
+        sub.save()
+        return redirect("task_detail", pk=task.pk)
+    return render(request, "tasks/item_form.html", {
+        "form": form, "heading": "New subtask", "back": task,
+    })
+
+
+@login_required
+def subtask_update(request, pk):
+    sub = get_object_or_404(SubTask, pk=pk, parent_task__user=request.user)
+    form = SubTaskForm(request.POST or None, instance=sub)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("task_detail", pk=sub.parent_task.pk)
+    return render(request, "tasks/item_form.html", {
+        "form": form, "heading": "Edit subtask", "back": sub.parent_task,
+    })
+
+
+@login_required
+@require_POST
+def subtask_complete(request, pk):
+    sub = get_object_or_404(SubTask, pk=pk, parent_task__user=request.user)
+    sub.status = "Completed"
+    sub.save()
+    return redirect("task_detail", pk=sub.parent_task.pk)
+
+
+@login_required
+@require_POST
+def subtask_delete(request, pk):
+    sub = get_object_or_404(SubTask, pk=pk, parent_task__user=request.user)
+    task_pk = sub.parent_task.pk
+    sub.delete()
+    return redirect("task_detail", pk=task_pk)
+
+
+# ---------- Notes ----------
+
+@login_required
+def note_create(request, task_pk):
+    task = get_object_or_404(Task, pk=task_pk, user=request.user)
+    form = NoteForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        note = form.save(commit=False)
+        note.task = task
+        note.save()
+        return redirect("task_detail", pk=task.pk)
+    return render(request, "tasks/item_form.html", {
+        "form": form, "heading": "New note", "back": task,
+    })
+
+
+@login_required
+def note_update(request, pk):
+    note = get_object_or_404(Note, pk=pk, task__user=request.user)
+    form = NoteForm(request.POST or None, instance=note)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("task_detail", pk=note.task.pk)
+    return render(request, "tasks/item_form.html", {
+        "form": form, "heading": "Edit note", "back": note.task,
+    })
+
+
+@login_required
+@require_POST
+def note_delete(request, pk):
+    note = get_object_or_404(Note, pk=pk, task__user=request.user)
+    task_pk = note.task.pk
+    note.delete()
+    return redirect("task_detail", pk=task_pk)

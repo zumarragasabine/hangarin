@@ -17,21 +17,43 @@
   <h3>Subtasks</h3>
   <ul>
     {% for sub in subtasks %}
-      <li>{{ sub.title }} <span class="badge">{{ sub.status }}</span></li>
+      <li>
+        {{ sub.title }} <span class="badge">{{ sub.status }}</span>
+        <a href="{% url 'subtask_update' sub.pk %}">Edit</a>
+        {% if sub.status != "Completed" %}
+        <form method="post" action="{% url 'subtask_complete' sub.pk %}" style="display:inline">
+          {% csrf_token %}<button type="submit">Mark done</button>
+        </form>
+        {% endif %}
+        <form method="post" action="{% url 'subtask_delete' sub.pk %}" style="display:inline"
+              onsubmit="return confirm('Delete this subtask?')">
+          {% csrf_token %}<button type="submit">Delete</button>
+        </form>
+      </li>
     {% empty %}
       <li class="muted">No subtasks.</li>
     {% endfor %}
   </ul>
+  <a href="{% url 'subtask_create' task.pk %}">+ Add subtask</a>
 </div>
 
 <div class="card">
   <h3>Notes</h3>
   <ul>
     {% for note in notes %}
-      <li>{{ note.content }}</li>
+      <li>
+        {{ note.content }}
+        <span class="muted">({{ note.created_at|date:"M d, g:i A" }})</span>
+        <a href="{% url 'note_update' note.pk %}">Edit</a>
+        <form method="post" action="{% url 'note_delete' note.pk %}" style="display:inline"
+              onsubmit="return confirm('Delete this note?')">
+          {% csrf_token %}<button type="submit">Delete</button>
+        </form>
+      </li>
     {% empty %}
       <li class="muted">No notes.</li>
     {% endfor %}
   </ul>
+  <a href="{% url 'note_create' task.pk %}">+ Add note</a>
 </div>
 {% endblock %}
