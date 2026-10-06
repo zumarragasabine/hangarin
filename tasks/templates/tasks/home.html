@@ -16,10 +16,10 @@
     </div>
   </div>
 
-  <div class="tile t-total"><div class="big">{{ total }}</div><div class="label">Total tasks</div></div>
-  <div class="tile t-open"><div class="big">{{ open_count }}</div><div class="label">Still open</div></div>
-  <div class="tile t-done"><div class="big">{{ completed }}</div><div class="label">Completed</div></div>
-  <div class="tile t-overdue"><div class="big">{{ overdue }}</div><div class="label">Overdue</div></div>
+  <a class="tile t-total" href="{% url 'task_list' %}"><div class="big">{{ total }}</div><div class="label">Total tasks</div></a>
+  <a class="tile t-open" href="{% url 'task_list' %}?status=Pending"><div class="big">{{ open_count }}</div><div class="label">Pending</div></a>
+  <a class="tile t-done" href="{% url 'task_list' %}?status=Completed"><div class="big">{{ completed }}</div><div class="label">Completed</div></a>
+  <a class="tile t-overdue" href="{% url 'task_list' %}?overdue=true"><div class="big">{{ overdue }}</div><div class="label">Overdue</div></a>
 
   <div class="tile t-due">
     <h3>Due soon</h3>
