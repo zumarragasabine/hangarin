@@ -1,22 +1,41 @@
+from unicodedata import category
+from urllib import request
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import Task, SubTask, Note
+from .models import Task, SubTask, Note, Category, Priority
 from .forms import TaskForm, SubTaskForm, NoteForm
 from django.utils import timezone
 
 @login_required
 def task_list(request):
-    tasks = Task.objects.filter(user=request.user).select_related("priority", "category").order_by("deadline")  # changed
-    status = request.GET.get("status")
-    if status in dict(Task.STATUS_CHOICES):
+    tasks = Task.objects.filter(user=request.user)   
+
+    status = request.GET.get("status")                
+    if status:
         tasks = tasks.filter(status=status)
-    else:
-        status = None
+
+    
+    if request.GET.get("filter") == "open":
+        tasks = tasks.exclude(status="Completed")
+    elif request.GET.get("filter") == "overdue":
+        tasks = tasks.filter(deadline__lt=timezone.now()).exclude(status="Completed")
+    category = request.GET.get("category")
+    priority = request.GET.get("priority")
+    if category:
+        tasks = tasks.filter(category_id=category)
+    if priority:
+     tasks = tasks.filter(priority_id=priority)
+
     return render(request, "tasks/task_list.html", {
         "tasks": tasks,
-        "status": status,
         "statuses": [s[0] for s in Task.STATUS_CHOICES],
+        "status": status,
+        "categories": Category.objects.all(),
+        "priorities": Priority.objects.all(),
+        "category": category,
+        "priority": priority,
     })
 
 

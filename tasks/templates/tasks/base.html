@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Hangarin</title>
   <style>
+    .filter-form { display: inline-flex; gap: .6rem; margin-left: 1rem; vertical-align: middle; }
+    .filters select { width: auto; padding: .35rem .8rem; }
     :root {
       --bg: #0a0f1f;
       --cyan: #22e5f5;
@@ -32,6 +34,7 @@
         radial-gradient(500px 400px at 15% 90%, rgba(94,234,212,.18), transparent 60%); }
 
     a { color: var(--cyan); }
+    .content a { color: var(--text); }
     .muted { color: var(--muted); font-size: .9rem; }
     ul { padding-left: 1.2rem; }
 
@@ -139,6 +142,8 @@
     .tile .sub { color: var(--muted); font-size: .92rem; }
     .tile .big { font-size: 2.6rem; font-weight: 800; line-height: 1; margin-top: auto; }
     .tile .label { margin-top: .3rem; color: var(--muted); }
+    a.tile { color: inherit; text-decoration: none; transition: transform .15s; }
+    a.tile:hover { transform: translateY(-3px); }
 
     .t-banner  { grid-column: span 2; grid-row: span 2;
                  background: linear-gradient(135deg, rgba(139,92,246,.45), rgba(34,229,245,.18)); }

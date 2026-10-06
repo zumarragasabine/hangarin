@@ -3,10 +3,29 @@
 <p><a href="{% url 'task_create' %}" class="btn-outline"><strong>+ New task</strong></a></p>
 <div class="filters card">
   Filter:
-  <a href="{% url 'task_list' %}" class="{% if not status %}active{% endif %}">All</a>
+  <a href="{% url 'task_list' %}?{% if category %}category={{ category }}&{% endif %}{% if priority %}priority={{ priority }}{% endif %}" class="{% if not status %}active{% endif %}">All</a>
   {% for s in statuses %}
-    <a href="?status={{ s|urlencode }}" class="{% if status == s %}active{% endif %}">{{ s }}</a>
+    <a href="?status={{ s|urlencode }}{% if category %}&category={{ category }}{% endif %}{% if priority %}&priority={{ priority }}{% endif %}" class="{% if status == s %}active{% endif %}">{{ s }}</a>
   {% endfor %}
+
+  <form method="get" class="filter-form">
+    {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+    {% if request.GET.filter %}<input type="hidden" name="filter" value="{{ request.GET.filter }}">{% endif %}
+
+    <select name="category" onchange="this.form.submit()">
+      <option value="">All categories</option>
+      {% for c in categories %}
+        <option value="{{ c.pk }}" {% if category == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="priority" onchange="this.form.submit()">
+      <option value="">All priorities</option>
+      {% for p in priorities %}
+        <option value="{{ p.pk }}" {% if priority == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.name }}</option>
+      {% endfor %}
+    </select>
+  </form>
 </div>
 
 {% for task in tasks %}
