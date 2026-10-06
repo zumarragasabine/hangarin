@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hangarin</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f4f6f8; color: #222; margin: 0; }
+    header { background: #2b5d8a; color: #fff; padding: 1rem 2rem; }
+    header a { color: #fff; text-decoration: none; font-size: 1.4rem; font-weight: 600; }
+    main { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+    .card { background: #fff; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+    .card h3 { margin: 0 0 .4rem; }
+    .card a { color: #2b5d8a; text-decoration: none; }
+    .badge { display: inline-block; padding: .15rem .6rem; border-radius: 999px;
+             font-size: .8rem; background: #e3e8ee; margin-right: .3rem; }
+    .Pending { background: #fde8c8; }
+    .In-Progress { background: #cfe3fa; }
+    .Completed { background: #d3f0d8; }
+    .filters a { margin-right: .75rem; color: #2b5d8a; text-decoration: none; }
+    .filters a.active { font-weight: 700; text-decoration: underline; }
+    .muted { color: #666; font-size: .9rem; }
+    ul { padding-left: 1.2rem; }
+  </style>
+</head>
+<body>
+  <header><a href="{% url 'task_list' %}">Hangarin: Task &amp; To-Do Manager</a></header>
+  <main>{% block content %}{% endblock %}</main>
+</body>
+</html>
