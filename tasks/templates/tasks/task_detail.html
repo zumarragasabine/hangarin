@@ -9,6 +9,8 @@
   <span class="badge">{{ task.category }}</span>
   <p class="muted">Deadline: {{ task.deadline|date:"M d, Y, g:i A" }}</p>
   <p>{{ task.description }}</p>
+  <a href="{% url 'task_update' task.pk %}">Edit</a> |
+  <a href="{% url 'task_delete' task.pk %}">Delete</a>
 </div>
 
 <div class="card">

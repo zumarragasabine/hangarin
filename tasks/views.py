@@ -4,6 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from .forms import TaskForm
 
 @login_required
 def task_list(request):
@@ -39,3 +41,41 @@ def register(request):
         login(request, user)
         return redirect("task_list")
     return render(request, "tasks/register.html", {"form": form})
+
+@login_required
+def task_create(request):
+    form = TaskForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        task = form.save(commit=False)
+        task.user = request.user
+        task.save()
+        return redirect("task_detail", pk=task.pk)
+    return render(request, "tasks/task_form.html", {"form": form, "heading": "New task"})
+
+
+@login_required
+def task_update(request, pk):
+    task = get_object_or_404(Task, pk=pk, user=request.user)
+    form = TaskForm(request.POST or None, instance=task)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("task_detail", pk=task.pk)
+    return render(request, "tasks/task_form.html", {"form": form, "heading": "Edit task"})
+
+
+@login_required
+def task_delete(request, pk):
+    task = get_object_or_404(Task, pk=pk, user=request.user)
+    if request.method == "POST":
+        task.delete()
+        return redirect("task_list")
+    return render(request, "tasks/task_confirm_delete.html", {"task": task})
+
+
+@login_required
+@require_POST
+def task_complete(request, pk):
+    task = get_object_or_404(Task, pk=pk, user=request.user)
+    task.status = "Completed"
+    task.save()
+    return redirect("task_list")

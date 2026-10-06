@@ -1,0 +1,12 @@
+{% extends "tasks/base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Delete this task?</h2>
+  <p>"{{ task.title }}" and its notes and subtasks will be permanently deleted.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'task_detail' task.pk %}">Cancel</a>
+  </form>
+</div>
+{% endblock %}

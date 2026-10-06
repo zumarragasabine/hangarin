@@ -1,5 +1,6 @@
 {% extends "tasks/base.html" %}
 {% block content %}
+<p><a href="{% url 'task_create' %}"><strong>+ New task</strong></a></p>
 <div class="filters card">
   Filter:
   <a href="{% url 'task_list' %}" class="{% if not status %}active{% endif %}">All</a>
@@ -15,6 +16,13 @@
     <span class="badge">{{ task.priority }}</span>
     <span class="badge">{{ task.category }}</span>
     <p class="muted">Deadline: {{ task.deadline|date:"M d, Y, g:i A" }}</p>
+    <a href="{% url 'task_update' task.pk %}">Edit</a>
+    {% if task.status != "Completed" %}
+    <form method="post" action="{% url 'task_complete' task.pk %}" style="display:inline">
+      {% csrf_token %}<button type="submit">Mark complete</button>
+    </form>
+    {% endif %}
+    <a href="{% url 'task_delete' task.pk %}">Delete</a>
   </div>
 {% empty %}
   <p>No tasks found.</p>
