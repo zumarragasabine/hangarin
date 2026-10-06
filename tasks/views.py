@@ -160,12 +160,17 @@ def home(request):
     hour = timezone.localtime().hour
     greeting = "Good morning" if hour < 12 else "Good afternoon" if hour < 18 else "Good evening"
     open_tasks = mine.exclude(status="Completed")
+    total = mine.count()
+    completed = mine.filter(status="Completed").count()
     return render(request, "tasks/home.html", {
         "greeting": greeting,
         "name": request.user.first_name or request.user.username,
-        "total": mine.count(),
+        "total": total,
         "open_count": open_tasks.count(),
-        "completed": mine.filter(status="Completed").count(),
+        "completed": completed,
+        "percent": round(completed / total * 100) if total else 0,
         "overdue": open_tasks.filter(deadline__lt=now).count(),
-        "due_soon": open_tasks.filter(deadline__gte=now).select_related("priority", "category").order_by("deadline")[:5],
+        "due_soon": open_tasks.filter(deadline__gte=now)
+                              .select_related("priority", "category")
+                              .order_by("deadline")[:5],
     })

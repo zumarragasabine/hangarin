@@ -1,6 +1,6 @@
 {% extends "tasks/base.html" %}
 {% block content %}
-<p><a href="{% url 'task_create' %}"><strong>+ New task</strong></a></p>
+<p><a href="{% url 'task_create' %}" class="btn-outline"><strong>+ New task</strong></a></p>
 <div class="filters card">
   Filter:
   <a href="{% url 'task_list' %}" class="{% if not status %}active{% endif %}">All</a>
@@ -16,13 +16,15 @@
     <span class="badge">{{ task.priority }}</span>
     <span class="badge">{{ task.category }}</span>
     <p class="muted">Deadline: {{ task.deadline|date:"M d, Y, g:i A" }}</p>
-    <a href="{% url 'task_update' task.pk %}">Edit</a>
-    {% if task.status != "Completed" %}
-    <form method="post" action="{% url 'task_complete' task.pk %}" style="display:inline">
-      {% csrf_token %}<button type="submit">Mark complete</button>
-    </form>
-    {% endif %}
-    <a href="{% url 'task_delete' task.pk %}">Delete</a>
+    <div class="actions" style="display:flex; align-items:center; gap:.6rem; margin-top:.6rem;">
+      <a href="{% url 'task_update' task.pk %}">Edit</a>
+      <a href="{% url 'task_delete' task.pk %}">Delete</a>
+      {% if task.status != "Completed" %}
+      <form method="post" action="{% url 'task_complete' task.pk %}" style="margin:0;">
+        {% csrf_token %}<button type="submit">Mark complete</button>
+      </form>
+      {% endif %}
+    </div>
   </div>
 {% empty %}
   <p>No tasks found.</p>

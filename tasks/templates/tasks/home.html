@@ -1,33 +1,55 @@
 {% extends "tasks/base.html" %}
 {% block content %}
-<div class="card banner">
-  <div class="muted" style="color:#cfe0f0">{% now "l, F j" %}</div>
-  <h1>{{ greeting }}, {{ name }}.</h1>
-  {% if total == 0 %}
-    <p>Your list is empty. Add your first task below.</p>
-  {% else %}
-    <p>You have {{ open_count }} open task{{ open_count|pluralize }}{% if overdue %}, {{ overdue }} overdue{% endif %}.</p>
-  {% endif %}
-  <a href="{% url 'task_list' %}" style="color:#fff">View my tasks</a> &nbsp;|&nbsp;
-  <a href="{% url 'task_create' %}" style="color:#fff">Add a task</a>
-</div>
+<div class="bento">
 
-<div class="stats">
-  <div class="card stat"><div class="num">{{ total }}</div>Total tasks</div>
-  <div class="card stat"><div class="num">{{ open_count }}</div>Still open</div>
-  <div class="card stat"><div class="num">{{ completed }}</div>Completed</div>
-  <div class="card stat"><div class="num">{{ overdue }}</div>Overdue</div>
-</div>
-
-<h2>Due soon</h2>
-{% for task in due_soon %}
-  <div class="card">
-    <a href="{% url 'task_detail' task.pk %}"><strong>{{ task.title }}</strong></a>
-    <span class="badge">{{ task.priority }}</span>
-    <span class="badge">{{ task.category }}</span>
-    <div class="muted">Due {{ task.deadline|date:"M d, g:i A" }}</div>
+  <div class="tile t-banner">
+    <div class="sub">{% now "l, F j" %}</div>
+    <h2 style="font-size:2rem">{{ greeting }}, {{ name }}.</h2>
+    {% if total == 0 %}
+      <p>Your list is empty. Add your first task to get started.</p>
+    {% else %}
+      <p>You have {{ open_count }} open task{{ open_count|pluralize }}{% if overdue %}, {{ overdue }} overdue{% endif %}.</p>
+    {% endif %}
+    <div style="margin-top:auto">
+      <a class="pill" href="{% url 'task_create' %}">+ Add a task</a>
+      <a class="pill" href="{% url 'task_list' %}">View my tasks</a>
+    </div>
   </div>
-{% empty %}
-  <div class="card muted">Nothing with a deadline coming up. Give a task a date and it will show here.</div>
-{% endfor %}
+
+  <div class="tile t-total"><div class="big">{{ total }}</div><div class="label">Total tasks</div></div>
+  <div class="tile t-open"><div class="big">{{ open_count }}</div><div class="label">Still open</div></div>
+  <div class="tile t-done"><div class="big">{{ completed }}</div><div class="label">Completed</div></div>
+  <div class="tile t-overdue"><div class="big">{{ overdue }}</div><div class="label">Overdue</div></div>
+
+  <div class="tile t-due">
+    <h3>Due soon</h3>
+    <p class="sub">Your next deadlines.</p>
+    {% for task in due_soon %}
+      <div class="due-item">
+        <a href="{% url 'task_detail' task.pk %}"><strong>{{ task.title }}</strong></a>
+        <div class="sub">{{ task.priority }} · {{ task.category }} · {{ task.deadline|date:"M d, g:i A" }}</div>
+      </div>
+    {% empty %}
+      <p class="sub" style="margin-top:.6rem">Nothing coming up. Give a task a deadline and it will show here.</p>
+    {% endfor %}
+  </div>
+
+  <div class="tile t-ring">
+    <div class="ring" style="--p: {{ percent }}"><span>{{ percent }}%</span></div>
+    <h3>Completion rate</h3>
+    <p class="sub">{{ completed }} of {{ total }} tasks done</p>
+  </div>
+
+  <div class="tile t-actions">
+    <h3>Quick actions</h3>
+    <p class="sub">Jump straight in.</p>
+    <div style="margin-top:.6rem">
+      <a class="pill" href="{% url 'task_create' %}">New task</a>
+      <a class="pill" href="{% url 'task_list' %}?status=Pending">Pending</a>
+      <a class="pill" href="{% url 'task_list' %}?status=In%20Progress">In progress</a>
+      <a class="pill" href="{% url 'task_list' %}?status=Completed">Completed</a>
+    </div>
+  </div>
+
+</div>
 {% endblock %}
