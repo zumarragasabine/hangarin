@@ -25,7 +25,25 @@
   </style>
 </head>
 <body>
-  <header><a href="{% url 'task_list' %}">Hangarin: Task &amp; To-Do Manager</a></header>
-  <main>{% block content %}{% endblock %}</main>
+  <header style="display:flex;justify-content:space-between;align-items:center">
+    <a href="{% url 'task_list' %}">Hangarin: Task &amp; To-Do Manager</a>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}" style="margin:0">
+        {% csrf_token %}
+        <span>{{ user.username }}</span>
+        <button type="submit">Log out</button>
+      </form>
+    {% endif %}
+  </header>
+
+  <main>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="card" style="background:#fde8e8">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
 </body>
 </html>
