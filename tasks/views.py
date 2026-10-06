@@ -193,3 +193,25 @@ def home(request):
                               .select_related("priority", "category")
                               .order_by("deadline")[:5],
     })
+
+from django.http import HttpResponse, JsonResponse
+from django.templatetags.static import static
+
+def manifest(request):
+    return JsonResponse({
+        "name": "Hangarin",
+        "short_name": "Hangarin",
+        "start_url": "/",
+        "scope": "/",
+        "display": "standalone",
+        "background_color": "#0a0f1f",
+        "theme_color": "#0a0f1f",
+        "icons": [
+            {"src": static("tasks/icons/icon-192.png"), "sizes": "192x192", "type": "image/png"},
+            {"src": static("tasks/icons/icon-512.png"), "sizes": "512x512", "type": "image/png"},
+        ],
+    }, content_type="application/manifest+json")
+
+def service_worker(request):
+    js = "self.addEventListener('fetch', () => {});"
+    return HttpResponse(js, content_type="application/javascript")

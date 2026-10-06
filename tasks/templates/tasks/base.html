@@ -1,6 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="manifest" href="{% url 'manifest' %}">
+  <meta name="theme-color" content="#0a0f1f">
+  <link rel="apple-touch-icon" href="{% static 'tasks/icons/icon-192.png' %}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Hangarin</title>
@@ -200,6 +204,11 @@
 
   </style>
 </head>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+  }
+</script>
 <body>
 {% with url=request.resolver_match.url_name %}
 <div class="layout">
@@ -229,7 +238,7 @@
     {% endif %}
     {% block content %}{% endblock %}
   </main>
-  
+
 </div>
 {% endwith %}
 </body>
