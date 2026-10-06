@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Task, SubTask, Note
 from .forms import TaskForm, SubTaskForm, NoteForm
+from django.utils import timezone
 
 @login_required
 def task_list(request):
@@ -150,3 +151,21 @@ def note_delete(request, pk):
     task_pk = note.task.pk
     note.delete()
     return redirect("task_detail", pk=task_pk)
+
+
+@login_required
+def home(request):
+    mine = Task.objects.filter(user=request.user)
+    now = timezone.now()
+    hour = timezone.localtime().hour
+    greeting = "Good morning" if hour < 12 else "Good afternoon" if hour < 18 else "Good evening"
+    open_tasks = mine.exclude(status="Completed")
+    return render(request, "tasks/home.html", {
+        "greeting": greeting,
+        "name": request.user.first_name or request.user.username,
+        "total": mine.count(),
+        "open_count": open_tasks.count(),
+        "completed": mine.filter(status="Completed").count(),
+        "overdue": open_tasks.filter(deadline__lt=now).count(),
+        "due_soon": open_tasks.filter(deadline__gte=now).select_related("priority", "category").order_by("deadline")[:5],
+    })

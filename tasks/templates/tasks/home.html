@@ -1,0 +1,33 @@
+{% extends "tasks/base.html" %}
+{% block content %}
+<div class="card banner">
+  <div class="muted" style="color:#cfe0f0">{% now "l, F j" %}</div>
+  <h1>{{ greeting }}, {{ name }}.</h1>
+  {% if total == 0 %}
+    <p>Your list is empty. Add your first task below.</p>
+  {% else %}
+    <p>You have {{ open_count }} open task{{ open_count|pluralize }}{% if overdue %}, {{ overdue }} overdue{% endif %}.</p>
+  {% endif %}
+  <a href="{% url 'task_list' %}" style="color:#fff">View my tasks</a> &nbsp;|&nbsp;
+  <a href="{% url 'task_create' %}" style="color:#fff">Add a task</a>
+</div>
+
+<div class="stats">
+  <div class="card stat"><div class="num">{{ total }}</div>Total tasks</div>
+  <div class="card stat"><div class="num">{{ open_count }}</div>Still open</div>
+  <div class="card stat"><div class="num">{{ completed }}</div>Completed</div>
+  <div class="card stat"><div class="num">{{ overdue }}</div>Overdue</div>
+</div>
+
+<h2>Due soon</h2>
+{% for task in due_soon %}
+  <div class="card">
+    <a href="{% url 'task_detail' task.pk %}"><strong>{{ task.title }}</strong></a>
+    <span class="badge">{{ task.priority }}</span>
+    <span class="badge">{{ task.category }}</span>
+    <div class="muted">Due {{ task.deadline|date:"M d, g:i A" }}</div>
+  </div>
+{% empty %}
+  <div class="card muted">Nothing with a deadline coming up. Give a task a date and it will show here.</div>
+{% endfor %}
+{% endblock %}
