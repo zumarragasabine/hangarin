@@ -21,4 +21,6 @@ urlpatterns = [
     path("note/<int:pk>/delete/", views.note_delete, name="note_delete"),
     path("manifest.json", views.manifest, name="manifest"),
     path("sw.js", views.service_worker, name="sw"),
+    path("subtasks/", views.subtask_list, name="subtask_list"),
+    path("notes/", views.note_list, name="note_list"),
 ]

@@ -1,0 +1,20 @@
+{% extends "tasks/base.html" %}
+{% block content %}
+<h2>Notes</h2>
+{% for note in notes %}
+  <div class="card">
+    <h3><a href="{% url 'task_detail' note.task.pk %}">{{ note.task.title }}</a></h3>
+    <p>{{ note.content }}</p>
+    <p class="muted">{{ note.created_at|date:"M d, g:i A" }}</p>
+    <div style="display:flex; align-items:center; gap:.6rem; margin-top:.6rem;">
+      <a href="{% url 'note_update' note.pk %}">Edit</a>
+      <form method="post" action="{% url 'note_delete' note.pk %}" style="margin:0;"
+            onsubmit="return confirm('Delete this note?')">
+        {% csrf_token %}<button type="submit" class="btn-outline">Delete</button>
+      </form>
+    </div>
+  </div>
+{% empty %}
+  <p>No notes yet. Open a task and click + Add note.</p>
+{% endfor %}
+{% endblock %}

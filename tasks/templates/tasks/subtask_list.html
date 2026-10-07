@@ -1,0 +1,25 @@
+{% extends "tasks/base.html" %}
+{% block content %}
+<h2>Subtasks</h2>
+{% for sub in subtasks %}
+  <div class="card">
+    <h3><a href="{% url 'task_detail' sub.parent_task.pk %}">{{ sub.title }}</a></h3>
+    <span class="badge">{{ sub.status }}</span>
+    <p class="muted">Task: {{ sub.parent_task.title }}</p>
+    <div style="display:flex; align-items:center; gap:.6rem; margin-top:.6rem;">
+      <a href="{% url 'subtask_update' sub.pk %}">Edit</a>
+      <form method="post" action="{% url 'subtask_delete' sub.pk %}" style="margin:0;"
+            onsubmit="return confirm('Delete this subtask?')">
+        {% csrf_token %}<button type="submit" class="btn-outline">Delete</button>
+      </form>
+      {% if sub.status != "Completed" %}
+      <form method="post" action="{% url 'subtask_complete' sub.pk %}" style="margin:0;">
+        {% csrf_token %}<button type="submit">Mark done</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+{% empty %}
+  <p>No subtasks yet. Open a task and click + Add subtask.</p>
+{% endfor %}
+{% endblock %}

@@ -200,6 +200,17 @@
     margin-right: auto !important;
   }
 
+  .card form > button.btn-outline[type=submit]:only-of-type {
+  color: var(--cyan);
+  background: transparent;
+  border: 2px solid var(--cyan);
+  box-shadow: none;
+  }
+  .card form > button.btn-outline[type=submit]:only-of-type:hover {
+    background: rgba(34,229,245,.15);
+    box-shadow: 0 0 16px rgba(34,229,245,.35);
+  }
+
 
 
   </style>
@@ -220,6 +231,8 @@
     <nav>
       <a href="{% url 'home' %}" class="{% if url == 'home' %}active{% endif %}">Home</a>
       <a href="{% url 'task_list' %}" class="{% if url == 'task_list' %}active{% endif %}">Tasks</a>
+      <a href="{% url 'subtask_list' %}" class="{% if url == 'subtask_list' %}active{% endif %}">Subtasks</a>
+      <a href="{% url 'note_list' %}" class="{% if url == 'note_list' %}active{% endif %}">Notes</a>
     </nav>
     <div class="user">
       <strong>{{ user.get_full_name|default:user.username }}</strong>

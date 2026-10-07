@@ -215,3 +215,14 @@ def manifest(request):
 def service_worker(request):
     js = "self.addEventListener('fetch', () => {});"
     return HttpResponse(js, content_type="application/javascript")
+
+@login_required
+def subtask_list(request):
+    subtasks = SubTask.objects.filter(parent_task__user=request.user).select_related("parent_task")
+    return render(request, "tasks/subtask_list.html", {"subtasks": subtasks})
+
+
+@login_required
+def note_list(request):
+    notes = Note.objects.filter(task__user=request.user).select_related("task")
+    return render(request, "tasks/note_list.html", {"notes": notes})
