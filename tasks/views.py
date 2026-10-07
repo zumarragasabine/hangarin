@@ -1,22 +1,91 @@
-from unicodedata import category
-from urllib import request
 from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from .models import Task, SubTask, Note, Category, Priority
-from .forms import TaskForm, SubTaskForm, NoteForm
+from django.forms import modelform_factory
 from django.utils import timezone
+from django.views.decorators.http import require_POST
+from .forms import TaskForm, SubTaskForm, NoteForm
+from .models import Task, SubTask, Note, Category, Priority
+
+LOOKUPS = {
+    "category": {"model": Category, "label": "Category", "plural": "Categories"},
+    "priority": {"model": Priority, "label": "Priority", "plural": "Priorities"},
+}
+
+
+def _ctx(kind, **extra):
+    cfg = LOOKUPS[kind]
+    return {
+        "label": cfg["label"], "plural": cfg["plural"],
+        "list_url": f"{kind}_list", "create_url": f"{kind}_create",
+        "update_url": f"{kind}_update", "delete_url": f"{kind}_delete",
+        **extra,
+    }
+
+
+@login_required
+def lookup_list(request, kind):
+    config = LOOKUPS.get(kind)
+    if config is None:
+        raise Http404
+    objects = config["model"].objects.all().order_by("name")
+    return render(request, "tasks/lookup_list.html", _ctx(kind, objects=objects))
+
+
+@login_required
+def lookup_create(request, kind):
+    config = LOOKUPS.get(kind)
+    if config is None:
+        raise Http404
+    Form = modelform_factory(config["model"], fields=["name"])
+    form = Form(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, f"{config['label']} added.")
+        return redirect(f"{kind}_list")
+    return render(request, "tasks/lookup_form.html", _ctx(kind, form=form, title="Add"))
+
+
+@login_required
+def lookup_update(request, kind, pk):
+    config = LOOKUPS.get(kind)
+    if config is None:
+        raise Http404
+    obj = get_object_or_404(config["model"], pk=pk)
+    Form = modelform_factory(config["model"], fields=["name"])
+    form = Form(request.POST or None, instance=obj)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, f"{config['label']} updated.")
+        return redirect(f"{kind}_list")
+    return render(request, "tasks/lookup_form.html", _ctx(kind, form=form, title="Edit"))
+
+
+@login_required
+def lookup_delete(request, kind, pk):
+    config = LOOKUPS.get(kind)
+    if config is None:
+        raise Http404
+    obj = get_object_or_404(config["model"], pk=pk)
+    if request.method == "POST":
+        if obj.task_set.exists():
+            messages.error(request, f"Can't delete '{obj.name}' because tasks are using it.")
+        else:
+            obj.delete()
+            messages.success(request, f"{config['label']} deleted.")
+    return redirect(f"{kind}_list")
+
 
 @login_required
 def task_list(request):
-    tasks = Task.objects.filter(user=request.user)   
+    tasks = Task.objects.filter(user=request.user)
 
-    status = request.GET.get("status")                
+    status = request.GET.get("status")
     if status:
         tasks = tasks.filter(status=status)
 
-    
     if request.GET.get("filter") == "open":
         tasks = tasks.exclude(status="Completed")
     elif request.GET.get("filter") == "overdue":
@@ -26,7 +95,7 @@ def task_list(request):
     if category:
         tasks = tasks.filter(category_id=category)
     if priority:
-     tasks = tasks.filter(priority_id=priority)
+        tasks = tasks.filter(priority_id=priority)
     q = request.GET.get("q", "").strip()
     if q:
         tasks = tasks.filter(Q(title__icontains=q) | Q(description__icontains=q))
@@ -39,6 +108,7 @@ def task_list(request):
         "priorities": Priority.objects.all(),
         "category": category,
         "priority": priority,
+        "q": q,
     })
 
 

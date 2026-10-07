@@ -1,0 +1,12 @@
+{% extends "tasks/base.html" %}
+{% block content %}
+<p><a href="{% url list_url %}">&larr; Back to {{ plural|lower }}</a></p>
+<div class="card">
+  <h2>{{ title }} {{ label|lower }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}

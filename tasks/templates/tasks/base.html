@@ -236,6 +236,8 @@
       <a href="{% url 'task_list' %}" class="{% if url == 'task_list' %}active{% endif %}">Tasks</a>
       <a href="{% url 'subtask_list' %}" class="{% if url == 'subtask_list' %}active{% endif %}">Subtasks</a>
       <a href="{% url 'note_list' %}" class="{% if url == 'note_list' %}active{% endif %}">Notes</a>
+      <a href="{% url 'category_list' %}" class="{% if url == 'category_list' %}active{% endif %}">Categories</a>
+      <a href="{% url 'priority_list' %}" class="{% if url == 'priority_list' %}active{% endif %}">Priorities</a>
     </nav>
     <div class="user">
       <strong>{{ user.get_full_name|default:user.username }}</strong>

@@ -1,0 +1,21 @@
+{% extends "tasks/base.html" %}
+{% block content %}
+<p><a href="{% url create_url %}" class="btn-outline"><strong>+ Add {{ label|lower }}</strong></a></p>
+<h2>{{ plural }}</h2>
+
+{% for obj in objects %}
+  <div class="card">
+    <h3>{{ obj.name }}</h3>
+    <p class="muted">{{ obj.task_set.count }} task{{ obj.task_set.count|pluralize }}</p>
+    <div style="display:flex; align-items:center; gap:.6rem; margin-top:.6rem;">
+      <a href="{% url update_url obj.pk %}">Edit</a>
+      <form method="post" action="{% url delete_url obj.pk %}" style="margin:0;"
+            onsubmit="return confirm('Delete this {{ label|lower }}?')">
+        {% csrf_token %}<button type="submit" class="btn-outline">Delete</button>
+      </form>
+    </div>
+  </div>
+{% empty %}
+  <p>No {{ plural|lower }} yet.</p>
+{% endfor %}
+{% endblock %}

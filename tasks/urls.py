@@ -23,4 +23,13 @@ urlpatterns = [
     path("sw.js", views.service_worker, name="sw"),
     path("subtasks/", views.subtask_list, name="subtask_list"),
     path("notes/", views.note_list, name="note_list"),
+    path("categories/", views.lookup_list, {"kind": "category"}, name="category_list"),
+    path("categories/new/", views.lookup_create, {"kind": "category"}, name="category_create"),
+    path("categories/<int:pk>/edit/", views.lookup_update, {"kind": "category"}, name="category_update"),
+    path("categories/<int:pk>/delete/", views.lookup_delete, {"kind": "category"}, name="category_delete"),
+
+    path("priorities/", views.lookup_list, {"kind": "priority"}, name="priority_list"),
+    path("priorities/new/", views.lookup_create, {"kind": "priority"}, name="priority_create"),
+    path("priorities/<int:pk>/edit/", views.lookup_update, {"kind": "priority"}, name="priority_update"),
+    path("priorities/<int:pk>/delete/", views.lookup_delete, {"kind": "priority"}, name="priority_delete"),
 ]
