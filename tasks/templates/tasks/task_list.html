@@ -2,15 +2,26 @@
 {% block content %}
 <p><a href="{% url 'task_create' %}" class="btn-outline"><strong>+ New task</strong></a></p>
 <div class="filters card">
+  <form method="get" class="search-form">
+    {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+    {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+    {% if priority %}<input type="hidden" name="priority" value="{{ priority }}">{% endif %}
+    {% if request.GET.filter %}<input type="hidden" name="filter" value="{{ request.GET.filter }}">{% endif %}
+    <input type="search" name="q" value="{{ q }}" placeholder="Search tasks...">
+    <button type="submit">Search</button>
+    {% if q %}<a href="{% url 'task_list' %}">Clear</a>{% endif %}
+  </form>
+
   Filter:
-  <a href="{% url 'task_list' %}?{% if category %}category={{ category }}&{% endif %}{% if priority %}priority={{ priority }}{% endif %}" class="{% if not status %}active{% endif %}">All</a>
+  <a href="{% url 'task_list' %}?q={{ q|urlencode }}{% if category %}&category={{ category }}{% endif %}{% if priority %}&priority={{ priority }}{% endif %}" class="{% if not status %}active{% endif %}">All</a>
   {% for s in statuses %}
-    <a href="?status={{ s|urlencode }}{% if category %}&category={{ category }}{% endif %}{% if priority %}&priority={{ priority }}{% endif %}" class="{% if status == s %}active{% endif %}">{{ s }}</a>
+    <a href="?status={{ s|urlencode }}&q={{ q|urlencode }}{% if category %}&category={{ category }}{% endif %}{% if priority %}&priority={{ priority }}{% endif %}" class="{% if status == s %}active{% endif %}">{{ s }}</a>
   {% endfor %}
 
   <form method="get" class="filter-form">
     {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
     {% if request.GET.filter %}<input type="hidden" name="filter" value="{{ request.GET.filter }}">{% endif %}
+    {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
 
     <select name="category" onchange="this.form.submit()">
       <option value="">All categories</option>

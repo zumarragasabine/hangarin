@@ -1,6 +1,6 @@
 from unicodedata import category
 from urllib import request
-
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -27,6 +27,9 @@ def task_list(request):
         tasks = tasks.filter(category_id=category)
     if priority:
      tasks = tasks.filter(priority_id=priority)
+    q = request.GET.get("q", "").strip()
+    if q:
+        tasks = tasks.filter(Q(title__icontains=q) | Q(description__icontains=q))
 
     return render(request, "tasks/task_list.html", {
         "tasks": tasks,
